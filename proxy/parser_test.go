@@ -18,17 +18,19 @@ var (
 	}
 )
 
+func checkErr(err error, t *testing.T) {
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestSymmetric(t *testing.T) {
 	for _, test := range testCases {
 		for _, version := range versions {
 			ciphertext, err := Encrypt(test.input, version)
-			if err != nil {
-				t.Error(err)
-			}
+			checkErr(err, t)
 			plaintext, err := Decrypt(ciphertext, version)
-			if err != nil {
-				t.Error(err)
-			}
+			checkErr(err, t)
 			if bytes.Compare(plaintext, test.input) != 0 {
 				t.Errorf("Plaintext: [%s], Result: [%s]\n", test.input, plaintext)
 			}
@@ -47,20 +49,14 @@ func TestRequestAndResponse(t *testing.T) {
 		for _, version := range versions {
 			for _, funcPair := range funcs {
 				ciphertext, err := funcPair.en(test.input, version)
-				if err != nil {
-					t.Error(err)
-				}
+				checkErr(err, t)
 				plaintext, err := funcPair.de(ciphertext, version)
-				if err != nil {
-					t.Error(err)
-				}
+				checkErr(err, t)
 				if bytes.Compare(plaintext, test.input) != 0 {
 					t.Errorf("Plaintext: [%s], Result: [%s]\n", test.input, plaintext)
 				}
 				reEncoded, err := funcPair.en(plaintext, version)
-				if err != nil {
-					t.Error(err)
-				}
+				checkErr(err, t)
 				if bytes.Compare(reEncoded, ciphertext) != 0 {
 					t.Error("Encoded messages do not match")
 				}
