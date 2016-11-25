@@ -46,16 +46,23 @@ func TestRequestAndResponse(t *testing.T) {
 	for _, test := range testCases {
 		for _, version := range versions {
 			for _, funcPair := range funcs {
-				cipherresp, err := funcPair.en(test.input, version)
+				ciphertext, err := funcPair.en(test.input, version)
 				if err != nil {
 					t.Error(err)
 				}
-				plainresp, err := funcPair.de(cipherresp, version)
+				plaintext, err := funcPair.de(ciphertext, version)
 				if err != nil {
 					t.Error(err)
 				}
-				if bytes.Compare(plainresp, test.input) != 0 {
-					t.Errorf("Plaintext: [%s], Result: [%s]\n", test.input, plainresp)
+				if bytes.Compare(plaintext, test.input) != 0 {
+					t.Errorf("Plaintext: [%s], Result: [%s]\n", test.input, plaintext)
+				}
+				reEncoded, err := funcPair.en(plaintext, version)
+				if err != nil {
+					t.Error(err)
+				}
+				if bytes.Compare(reEncoded, ciphertext) != 0 {
+					t.Error("Encoded messages do not match")
 				}
 			}
 		}
