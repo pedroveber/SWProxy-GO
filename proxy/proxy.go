@@ -7,11 +7,11 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/crayontxx/SWProxy-Go/proxy/plugins"
+	"github.com/crayontxx/SWProxy-Go/proxy/plugin"
 
 	"github.com/elazarl/goproxy"
 
-	_ "github.com/crayontxx/SWProxy-Go/proxy/plugins/demoPlugin"
+	_ "github.com/crayontxx/SWProxy-Go/proxy/plugin/demoPlugin"
 )
 
 type Options struct {

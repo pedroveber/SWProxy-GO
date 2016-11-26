@@ -3,7 +3,7 @@ package demoPlugin
 import (
 	"log"
 
-	"github.com/crayontxx/SWProxy-Go/proxy/plugins"
+	"github.com/crayontxx/SWProxy-Go/proxy/plugin"
 )
 
 type DemoPlugin struct{}
