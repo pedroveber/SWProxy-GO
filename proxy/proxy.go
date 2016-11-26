@@ -1,21 +1,44 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
+
+	"github.com/crayontxx/SWProxy-Go/proxy/plugins"
 
 	"github.com/elazarl/goproxy"
+
+	_ "github.com/crayontxx/SWProxy-Go/proxy/plugins/demoPlugin"
 )
 
+type Options struct {
+	port int
+}
+
+func (op *Options) parseArguments() {
+	flag.IntVar(&op.port, "p", 8080, "port for proxy server")
+	flag.Parse()
+}
+
 func main() {
+	var option Options
+	option.parseArguments()
+
 	proxy := goproxy.NewProxyHttpServer()
-	//proxy.Verbose = true
-	proxy.OnRequest(goproxy.ReqHostMatches(regexp.MustCompile("^.*(com2us.net|qpyou.cn)"))).DoFunc(
+	com2usUrlRe := regexp.MustCompile("^.*com2us.net/api/gateway_c2.php")
+	proxy.OnRequest(goproxy.UrlMatches(com2usUrlRe)).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
-			r.Header.Set("X-GoProxy", "yxorPoG-X")
-			log.Println(r.URL)
+			plugin.OnRequest(r)
 			return r, nil
 		})
-	log.Fatal(http.ListenAndServe(":443", proxy))
+
+	proxy.OnResponse(goproxy.UrlMatches(com2usUrlRe)).DoFunc(
+		func(resp *http.Response, ctx *goproxy.ProxyCtx) *http.Response {
+			plugin.OnResponse(resp)
+			return resp
+		})
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(option.port), proxy))
 }
