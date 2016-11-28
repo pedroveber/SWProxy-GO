@@ -42,6 +42,7 @@ func Register(name string, p Plugin, pt PluginType) {
 		}
 		writePlugins[name] = p
 	}
+	log.Println("Find plugin: ", name)
 }
 
 func getVersion(url *url.URL) int {

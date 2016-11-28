@@ -12,6 +12,7 @@ import (
 	"github.com/elazarl/goproxy"
 
 	_ "github.com/crayontxx/SWProxy-Go/proxy/plugin/demoPlugin"
+	_ "github.com/crayontxx/SWProxy-Go/proxy/plugin/weakenedUnitPlugin"
 )
 
 type Options struct {
