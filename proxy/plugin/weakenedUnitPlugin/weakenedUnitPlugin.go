@@ -1,6 +1,10 @@
 package weakenedUnitPlugin
 
-import "github.com/crayontxx/SWProxy-Go/proxy/plugin"
+import (
+	"log"
+
+	"github.com/crayontxx/SWProxy-Go/proxy/plugin"
+)
 
 type WeakenedUnitPlugin struct{}
 
@@ -9,42 +13,59 @@ func init() {
 }
 
 func (p WeakenedUnitPlugin) OnRequest(m map[string]interface{}) {
+	switch m["command"] {
+	case "BattleRiftDungeonResult":
+		log.Println(m)
+	}
 }
 
 func (p WeakenedUnitPlugin) OnResponse(m map[string]interface{}) {
-
-	if m["command"] == "BattleScenarioStart" {
-		for _, scenario := range m["opp_unit_list"].([]interface{}) {
-			normalWeakening(scenario)
-		}
-	} else if m["command"] == "BattleDungeonStart" {
-		for _, scenario := range m["dungeon_unit_list"].([]interface{}) {
-			normalWeakening(scenario)
-		}
-	} else if m["command"] == "BattleTrialTowerStart_v2" {
-		for _, scenario := range m["trial_tower_unit_list"].([]interface{}) {
-			towerWeakening(scenario)
-		}
+	switch m["command"] {
+	case "BattleScenarioStart":
+		normalWeakening(m, "opp_unit_list")
+	case "BattleDungeonStart":
+		normalWeakening(m, "dungeon_unit_list")
+	case "BattleTrialTowerStart_v2":
+		towerWeakening(m, "trial_tower_unit_list")
+	case "BattleRiftDungeonStart":
+		riftDungeonWeakening(m, "rift_dungeon_unit_list")
+	case "BattleRiftDungeonResult":
+		log.Println(m)
 	}
 }
 
-func normalWeakening(list interface{}) {
-	for _, unit := range list.([]interface{}) {
-		// updateUnitAbility(unit, "atk", 11)
-		// updateUnitAbility(unit, "def", 11)
-		updateUnitAbilityByPercent(unit, "spd", 0.25)
-		// updateUnitAbilityByPercent(unit, "con", 0.5)
-	}
+func normalWeakening(m map[string]interface{}, listName string) {
+	forEachUnit(listName, m, func(unit map[string]interface{}) {
+		updateUnitAbilityByPercent(unit, "spd", 0.5)
+		updateUnitAbilityByPercent(unit, "con", 0.2)
+		updateUnitAbilityByPercent(unit, "def", 0.01)
+		// updateUnitAbilityByPercent(unit, "def", 0.1)
+	})
 }
 
-func towerWeakening(list interface{}) {
-	for _, unit := range list.([]interface{}) {
-		updateUnitAbilityByPercent(unit, "atk", 0.7)
+func towerWeakening(m map[string]interface{}, listName string) {
+	forEachUnit(listName, m, func(unit map[string]interface{}) {
+		updateUnitAbility(unit, "atk", 100)
 		updateUnitAbilityByPercent(unit, "spd", 0.5)
 		updateUnitAbility(unit, "resist", 25)
 		updateUnitAbility(unit, "hit_bonus", 10)
 		updateUnitAbility(unit, "crit_damage_reduction", 0)
+	})
+}
 
+func riftDungeonWeakening(m map[string]interface{}, listName string) {
+	forEachUnit(listName, m, func(unit map[string]interface{}) {
+		updateUnitAbilityByPercent(unit, "atk", 0.5)
+		updateUnitAbilityByPercent(unit, "spd", 0.2)
+		updateUnitAbility(unit, "resist", 15)
+	})
+}
+
+func forEachUnit(listName string, m map[string]interface{}, f func(unit map[string]interface{})) {
+	for _, scenario := range m[listName].([]interface{}) {
+		for _, unit := range scenario.([]interface{}) {
+			f(unit.(map[string]interface{}))
+		}
 	}
 }
 
