@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/elazarl/goproxy"
 
+	"github.com/crayontxx/SWProxy-Go/log"
 	_ "github.com/crayontxx/SWProxy-Go/proxy/plugin/demoPlugin"
 	_ "github.com/crayontxx/SWProxy-Go/proxy/plugin/weakenedUnitPlugin"
 )

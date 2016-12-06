@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
 
+	"github.com/crayontxx/SWProxy-Go/log"
 	"github.com/crayontxx/SWProxy-Go/proxy/parser"
 )
 
@@ -53,24 +53,24 @@ func getVersion(url *url.URL) int {
 	}
 }
 
-func getRequestPOSTContent(r *http.Request, b []byte) (map[string]interface{}, error) {
+func getRequestPOSTContent(r *http.Request, b []byte) (map[string]interface{}, []byte, error) {
 	return getPOSTContent(b, parser.DecryptRequest, getVersion(r.URL))
 }
 
-func getResponsePOSTContent(r *http.Response, b []byte) (map[string]interface{}, error) {
+func getResponsePOSTContent(r *http.Response, b []byte) (map[string]interface{}, []byte, error) {
 	return getPOSTContent(b, parser.DecryptResponse, getVersion(r.Request.URL))
 }
 
-func getPOSTContent(b []byte, f parser.CryptFunc, version int) (map[string]interface{}, error) {
+func getPOSTContent(b []byte, f parser.CryptFunc, version int) (map[string]interface{}, []byte, error) {
 	b, err := f(b, version)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var content map[string]interface{}
 	err = json.Unmarshal(b, &content)
 
-	return content, err
+	return content, b, err
 }
 
 func createRequestPOSTContent(r *http.Request, m map[string]interface{}) ([]byte, error) {
@@ -94,16 +94,17 @@ func OnRequest(r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
-		log.Println(err)
+		log.Debugln(err)
 		return
 	}
 
-	m, err := getRequestPOSTContent(r, b)
+	m, b, err := getRequestPOSTContent(r, b)
 	if err != nil {
-		log.Println(err)
+		log.Debugln(err)
 		return
 	}
 
+	log.Debugln("Request:", string(b))
 	for _, p := range readPlugins {
 		p.OnRequest(m)
 	}
@@ -113,7 +114,7 @@ func OnRequest(r *http.Request) {
 
 	b, err = createRequestPOSTContent(r, m)
 	if err != nil {
-		log.Println(err)
+		log.Debugln(err)
 		return
 	}
 
@@ -125,16 +126,17 @@ func OnResponse(r *http.Response) {
 	b, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {
-		log.Println(err)
+		log.Debugln(err)
 		return
 	}
 
-	m, err := getResponsePOSTContent(r, b)
+	m, b, err := getResponsePOSTContent(r, b)
 	if err != nil {
-		log.Println(err)
+		log.Debugln(err)
 		return
 	}
 
+	log.Debugln("Response:", string(b))
 	for _, p := range readPlugins {
 		p.OnResponse(m)
 	}
@@ -144,7 +146,7 @@ func OnResponse(r *http.Response) {
 
 	b, err = createResponsePOSTContent(r, m)
 	if err != nil {
-		log.Println(err)
+		log.Debugln(err)
 		return
 	}
 

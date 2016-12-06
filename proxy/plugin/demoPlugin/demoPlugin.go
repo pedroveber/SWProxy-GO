@@ -1,8 +1,7 @@
 package demoPlugin
 
 import (
-	"log"
-
+	"github.com/crayontxx/SWProxy-Go/log"
 	"github.com/crayontxx/SWProxy-Go/proxy/plugin"
 )
 
