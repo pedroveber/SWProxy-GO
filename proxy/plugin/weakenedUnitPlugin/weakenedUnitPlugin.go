@@ -35,7 +35,8 @@ func normalWeakening(m map[string]interface{}, listName string) {
 func dungeonWeakening(m map[string]interface{}, listName string) {
 	forEachUnit(listName, m, func(unit map[string]interface{}) {
 		updateUnitAbilityByPercent(unit, "spd", 0.5)
-		updateUnitAbilityByPercent(unit, "con", 0.8)
+		updateUnitAbilityByPercent(unit, "con", 0.5)
+		updateUnitAbilityByPercent(unit, "def", 0.5)
 		updateUnitAbility(unit, "resist", 25)
 	})
 }
