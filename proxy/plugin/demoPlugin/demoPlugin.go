@@ -12,9 +12,13 @@ func init() {
 }
 
 func (p DemoPlugin) OnRequest(m map[string]interface{}) {
-	log.Printf("REQUEST: %s\n", m["command"])
+	if c, ok := m["command"]; ok {
+		log.Printf("REQUEST: %s\n", c)
+	}
 }
 
 func (p DemoPlugin) OnResponse(m map[string]interface{}) {
-	log.Printf("RESPONSE: %s\n", m["command"])
+	if c, ok := m["command"]; ok {
+		log.Printf("RESPONSE: %s\n", c)
+	}
 }

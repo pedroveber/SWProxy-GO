@@ -91,6 +91,10 @@ func createPOSTContent(m map[string]interface{}, f parser.CryptFunc, version int
 }
 
 func OnRequest(r *http.Request) {
+	if r.Method != "POST" {
+		return
+	}
+
 	b, err := ioutil.ReadAll(r.Body)
 
 	if err != nil {

@@ -12,6 +12,7 @@ import (
 
 	"github.com/crayontxx/SWProxy-Go/log"
 	_ "github.com/crayontxx/SWProxy-Go/proxy/plugin/demoPlugin"
+	_ "github.com/crayontxx/SWProxy-Go/proxy/plugin/loginPlugin"
 	_ "github.com/crayontxx/SWProxy-Go/proxy/plugin/weakenedUnitPlugin"
 )
 
@@ -29,7 +30,7 @@ func main() {
 	option.parseArguments()
 
 	proxy := goproxy.NewProxyHttpServer()
-	com2usUrlRe := regexp.MustCompile("^.*(com2us.net|qpyou.cn)/api/gateway_c2.php")
+	com2usUrlRe := regexp.MustCompile("^.*((com2us.net|qpyou.cn)/api/gateway_c2.php|location_c2.php)")
 	proxy.OnRequest(goproxy.UrlMatches(com2usUrlRe)).DoFunc(
 		func(r *http.Request, ctx *goproxy.ProxyCtx) (*http.Request, *http.Response) {
 			plugin.OnRequest(r)
