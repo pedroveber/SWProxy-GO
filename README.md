@@ -1,7 +1,8 @@
 # SWProxy-GO
 
 This is an evil project which has been against my initial proposal as to just
-collect monster, rune and drop information of Summoners War.
+collect monster, rune and drop information of Summoners War. Anyway, I have
+drawn the line that never affect the other players.
 
 Please use this proxy after your **careful consideration**.
 
