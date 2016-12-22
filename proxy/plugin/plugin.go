@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strings"
 
 	"github.com/crayontxx/SWProxy-Go/log"
@@ -17,9 +18,19 @@ type Plugin interface {
 	OnResponse(m map[string]interface{})
 }
 
+type PluginPortfolio struct {
+	P      Plugin
+	Type   PluginType
+	Config interface{} // ptr
+}
+
+type PluginConfig struct {
+	Name string
+	Data json.RawMessage
+}
+
 var (
-	readPlugins  = make(map[string]Plugin)
-	writePlugins = make(map[string]Plugin)
+	plugins = make(map[string]*PluginPortfolio)
 )
 
 type PluginType int
@@ -29,20 +40,36 @@ const (
 	WritePlugin            = 2
 )
 
-func Register(name string, p Plugin, pt PluginType) {
-	if pt&ReadPlugin > 0 {
-		if _, ok := readPlugins[name]; ok {
-			log.Fatalln("Duplicated read plugin name: ", name)
-		}
-		readPlugins[name] = p
+func Register(name string, p Plugin, pt PluginType, config interface{}) {
+	if _, ok := plugins[name]; ok {
+		log.Fatalln("Duplicated plguin name: ", name)
 	}
-	if pt&WritePlugin > 0 {
-		if _, ok := writePlugins[name]; ok {
-			log.Fatalln("Duplicated write plugin name: ", name)
-		}
-		writePlugins[name] = p
+	value := reflect.ValueOf(config)
+	if config != nil && value.Kind() != reflect.Ptr {
+		log.Fatalf("Error in plugin %v: need a pointer to config variable", name)
 	}
-	log.Println("Find plugin: ", name)
+	plugins[name] = &PluginPortfolio{p, pt, config}
+	log.Println("Loaded Plugin: ", name)
+}
+
+func ApplyConfig(cfg json.RawMessage) {
+	var pcs []PluginConfig
+	err := json.Unmarshal(cfg, &pcs)
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, c := range pcs {
+		if _, ok := plugins[c.Name]; !ok {
+			log.Debug("skip config of plugin: ", c.Name)
+			continue
+		}
+		pf := plugins[c.Name]
+		err = json.Unmarshal(c.Data, pf.Config)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Debugf("Loaded config of plugin(%v) %+v\n", c.Name, pf.Config)
+	}
 }
 
 func getVersion(url *url.URL) int {
@@ -109,11 +136,16 @@ func OnRequest(r *http.Request) {
 	}
 
 	log.Debugln("Request:", string(b))
-	for _, p := range readPlugins {
-		p.OnRequest(m)
+	for _, pf := range plugins {
+		if pf.Type == ReadPlugin {
+			pf.P.OnRequest(m)
+		}
 	}
-	for _, p := range writePlugins {
-		p.OnRequest(m)
+
+	for _, pf := range plugins {
+		if pf.Type == WritePlugin {
+			pf.P.OnRequest(m)
+		}
 	}
 
 	b, err = createRequestPOSTContent(r, m)
@@ -141,11 +173,16 @@ func OnResponse(r *http.Response) {
 	}
 
 	log.Debugln("Response:", string(b))
-	for _, p := range readPlugins {
-		p.OnResponse(m)
+	for _, pf := range plugins {
+		if pf.Type == ReadPlugin {
+			pf.P.OnResponse(m)
+		}
 	}
-	for _, p := range writePlugins {
-		p.OnResponse(m)
+
+	for _, pf := range plugins {
+		if pf.Type == WritePlugin {
+			pf.P.OnResponse(m)
+		}
 	}
 
 	b, err = createResponsePOSTContent(r, m)

@@ -16,7 +16,7 @@ type Logger struct {
 var logger *Logger
 
 func init() {
-	logf, err := os.OpenFile("log.log", os.O_WRONLY|os.O_CREATE, 0640)
+	logf, err := os.OpenFile("log.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0640)
 	if err != nil {
 		stdLog.Fatalln(err)
 	}

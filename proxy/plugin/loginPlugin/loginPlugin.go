@@ -9,7 +9,7 @@ import (
 type LoginPlugin struct{}
 
 func init() {
-	plugin.Register("Login plugin", LoginPlugin{}, plugin.WritePlugin)
+	plugin.Register("Login plugin", LoginPlugin{}, plugin.WritePlugin, nil)
 }
 
 func (p LoginPlugin) OnRequest(m map[string]interface{}) {

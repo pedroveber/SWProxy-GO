@@ -8,7 +8,7 @@ import (
 type DemoPlugin struct{}
 
 func init() {
-	plugin.Register("Demo plugin", DemoPlugin{}, plugin.ReadPlugin)
+	plugin.Register("Demo plugin", DemoPlugin{}, plugin.ReadPlugin, nil)
 }
 
 func (p DemoPlugin) OnRequest(m map[string]interface{}) {

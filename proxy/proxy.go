@@ -1,8 +1,10 @@
 package main
 
 import (
-	"flag"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 
@@ -16,18 +18,26 @@ import (
 	_ "github.com/crayontxx/SWProxy-Go/proxy/plugin/weakenedUnitPlugin"
 )
 
-type Options struct {
-	port int
+var cfg struct {
+	Port    int
+	Plugins json.RawMessage
 }
 
-func (op *Options) parseArguments() {
-	flag.IntVar(&op.port, "p", 8080, "port for proxy server")
-	flag.Parse()
+func fatalOr(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func main() {
-	var option Options
-	option.parseArguments()
+	// TODO: avoid hardcoding
+	f, err := os.Open("./config.cfg")
+	fatalOr(err)
+	bs, err := ioutil.ReadAll(f)
+	fatalOr(err)
+	err = json.Unmarshal(bs, &cfg)
+	fatalOr(err)
+	plugin.ApplyConfig(cfg.Plugins)
 
 	proxy := goproxy.NewProxyHttpServer()
 	com2usUrlRe := regexp.MustCompile("^.*((com2us.net|qpyou.cn)/api/gateway_c2.php|location_c2.php)")
@@ -42,5 +52,5 @@ func main() {
 			plugin.OnResponse(resp)
 			return resp
 		})
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(option.port), proxy))
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(cfg.Port), proxy))
 }
