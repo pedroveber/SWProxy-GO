@@ -1,14 +1,25 @@
 # SWProxy-GO
 
+## Deprecated repo
+
+This project is no longer updated anymore because I feel this game less
+attractive to me now.
+
+## Intro
+
 This is an evil project which has been against my initial proposal as to just
 collect monster, rune and drop information of Summoners War. Anyway, I have
 drawn the line that never affect the other players.
 
 Please use this proxy after your **careful consideration**.
 
-Since early Dec 2016, Com2Us has been using HTTPS protocol within this game.
-Luckily, the initial request is still via HTTP, which allows us to continue 
-using HTTP in the following requests. However, AFAIK, Apple will force all of 
-the applications on App Store to apply HTTPS since Jan 2017, I have no idea if 
-this project can still work at that time. We will see.
+## How to use
+
+ - Make sure you have installed [go](https://golang.org/) environment
+ - `go get -u github.com/crayontxx/swproxy-go/proxy`
+ - `cd $GOPATH/src/github.com/crayontxx/swproxy-go/proxy`
+ - `go run proxy.go`
+ - You can change the setting in `config.cfg` before running the proxy
+ - Make your device's http proxy point to the proxy
+ - Enjoy
 
