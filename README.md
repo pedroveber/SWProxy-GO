@@ -16,8 +16,8 @@ Please use this proxy after your **careful consideration**.
 ## How to use
 
  - Make sure you have installed [go](https://golang.org/) environment
- - `go get -u github.com/crayontxx/swproxy-go/proxy`
- - `cd $GOPATH/src/github.com/crayontxx/swproxy-go/proxy`
+ - `go get -u github.com/crayontxx/SWProxy-Go/proxy`
+ - `cd $GOPATH/src/github.com/crayontxx/SWProxy-Go/proxy`
  - `go run proxy.go`
  - You can change the setting in `config.cfg` before running the proxy
  - Make your device's http proxy point to the proxy
