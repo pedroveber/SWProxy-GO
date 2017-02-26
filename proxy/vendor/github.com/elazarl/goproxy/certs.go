@@ -1,0 +1,72 @@
+package goproxy
+
+import (
+	"crypto/tls"
+	"crypto/x509"
+)
+
+func init() {
+	if goproxyCaErr != nil {
+		panic("Error parsing builtin CA " + goproxyCaErr.Error())
+	}
+	var err error
+	if GoproxyCa.Leaf, err = x509.ParseCertificate(GoproxyCa.Certificate[0]); err != nil {
+		panic("Error parsing builtin CA " + err.Error())
+	}
+}
+
+var tlsClientSkipVerify = &tls.Config{InsecureSkipVerify: true}
+
+var defaultTLSConfig = &tls.Config{
+	InsecureSkipVerify: true,
+}
+
+var CA_CERT = []byte(`-----BEGIN CERTIFICATE-----
+MIIC+zCCAeOgAwIBAgIJAJpLG83pjrbvMA0GCSqGSIb3DQEBCwUAMBQxEjAQBgNV
+BAMMCWxvY2FsaG9zdDAeFw0xNzAyMjYwMjAwMzJaFw0xODAyMjYwMjAwMzJaMBQx
+EjAQBgNVBAMMCWxvY2FsaG9zdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBAMdnK8JCIjq55qGF88SdH0g8AaAaWXeosEL0aqyM+VkTH6vv1ulvRCz6rdwz
+gAclESAALKcyfeUFoLFPrCOYU5StzUhsCZfSAjfYd7m/Xz+QwuDp2pNmzmx/ItOG
+OISgMOSwQX3I2nOw2I/koSmzYZsNLrBvMOOcmakiRz98u4BipSnrSFBcR2+ixbob
+tt9Cqv9hcpEKfPoEKFbl+IUop4j1T41/YNfkGO3hFFSnkc1svxwhC5zWKqXDHgoT
+1n58b4qTT8HbRmVJMhqR7tO35tWQwtQqDPwnap23j8t7dmn2Boll6E2WJhEVZsuA
+s85Ot2i5m0myv7F17pPQa+7aKLkCAwEAAaNQME4wHQYDVR0OBBYEFBFVdnMG13vY
+YCe6Izl7HW7A0YXSMB8GA1UdIwQYMBaAFBFVdnMG13vYYCe6Izl7HW7A0YXSMAwG
+A1UdEwQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBADNed5zLhpXgvFSXRMeV8vTR
+1DZNQVPlD7iaQMCKKWAH6Wmd/DoRknxT2qzbMzdX1kZyctzEZcLJYZadU5sRBZ25
+MyiHW++Z4Hgn/RIbCKzSNJuRvgbX93FcVA32aeuULMf1UDvkjP4r8H3GyZSDdno/
+sIJGLvc0zL15CCyyVg2L+OiATJDYccDkXHwNN74SYukJJoC00r/bPD1zeWBLe8yZ
+BUYQRsTU6M5MBZBOn4OfsENMrODLmyqU/VfGFSH22VkeDyAuYycckWy0e/lxQYZh
+Vx1iLUz62sQwBvHqKtw5s+I+qCe/8uma7aKVV0pvxYQ61khNAHf31IFZ1ZpkQGc=
+-----END CERTIFICATE-----`)
+
+var CA_KEY = []byte(`-----BEGIN RSA PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDHZyvCQiI6ueah
+hfPEnR9IPAGgGll3qLBC9GqsjPlZEx+r79bpb0Qs+q3cM4AHJREgACynMn3lBaCx
+T6wjmFOUrc1IbAmX0gI32He5v18/kMLg6dqTZs5sfyLThjiEoDDksEF9yNpzsNiP
+5KEps2GbDS6wbzDjnJmpIkc/fLuAYqUp60hQXEdvosW6G7bfQqr/YXKRCnz6BChW
+5fiFKKeI9U+Nf2DX5Bjt4RRUp5HNbL8cIQuc1iqlwx4KE9Z+fG+Kk0/B20ZlSTIa
+ke7Tt+bVkMLUKgz8J2qdt4/Le3Zp9gaJZehNliYRFWbLgLPOTrdouZtJsr+xde6T
+0Gvu2ii5AgMBAAECggEAL4Keg398Zl+q2utupHcHYA+kF4CPtpoDvUA9NnW0Z4vN
+7QqNOztelBT6XdALfihPxz8jZIb8RhgsLHMeQbDmoTM0CUBsnLbV/nZeOGynhh64
+wBwYDyzcnC9CngGJ79e3LpXsVMsJea02PDquR6BM7kOaz0D+9gx29DyNm0vd5P2w
+Pz/x8XQaGR9L6s1OY5V8MQyHnhKJGhdzUFqm1wCDB1GbGsFXwRMEbxgsspQr56e/
+Izfn5AK7fWVZTyWrqPkKl3Ei+E3j5ETIJkzXcX/YcxuVSKmxwlObsEmK886T1VFk
+elAWKdHjNqVSPoK3Aue2vyyz90LgaVEAlzEC21aWDQKBgQDqACzdb57YsUmLoPqi
+SpWuaG6FVWerdCd3bWs3S3St44krGgHIlpaGtwtbUjIk9p/NbSrsygFHbHq5CN38
+68xBmW6rt/EqHNlWQYLKJsFz056PPnHqFkP1bOkg1kXSDzRyBnTyS16nDw143sSV
+OkNBfjG2XgFH15cvkmLKJo0jtwKBgQDaJlBwqJq/y1OWKwMPFyUpeBD3hNGKNoUj
+SICnU+l8fk+ogLriqbDEEWmjIIMOtGkfFJLh/Cbid67Q1u3lyvFONvz1mBb+0cdq
+N2B20qYd+FrTIctPmv4Q13gQNVYLHe3MpqwH3SGw3wlO7wfercWw/MEPPEZV5Rfy
+sbmJpN13DwKBgQC4mVzLb8QbZHkFiwBOSZKdnUsbKo33R1HfOFWtsHwite6/Luwb
+RxkGu55c85IVcO4OTEHhvVaW9vA1ytX9MjPXyGfzVdAODeYy0smQGlTgwCBFFtkc
+92WzVrDvM7qvBUm1bnyRrH3GQuy43tyscOMf5qLnIG/YMi7V26DNou4TLwKBgEld
+42XQPqNMZaM2egPkO9pTiBlGsRYzudkg9CvSW89Dx9Sa3r+GZG28kXOMZqdWY5hR
+Wgjovccii0evUTkcZMVyVubeLLWspc2CLE4qEDY6JYmmbvMp5FKTtMx2s6ZvfV97
+mpXWeBM9H6tNVq88cCVTDDbshZczwjccMJMrQFRfAoGAeEjx5H3bZeRHO+L/I3QU
+I579qT8E3F6QwMmqIDv4bUcJQvWnMXLy+Df8omzYXPID/f0mULiiRs8YRvEFkd+H
+WAO1EYw6l/SXIk919QL2rGsAlmS+Wid1wJBv6h0+mBvGKoMlwLYpV1N5gcle6pEF
+kQhnObeMUH2/N8FRfoueORk=
+-----END RSA PRIVATE KEY-----`)
+
+var GoproxyCa, goproxyCaErr = tls.X509KeyPair(CA_CERT, CA_KEY)

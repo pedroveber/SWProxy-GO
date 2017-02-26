@@ -1,0 +1,16 @@
+{
+	"ImportPath": "github.com/crayontxx/SWProxy-Go/proxy",
+	"GoVersion": "go1.8",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/crayontxx/SWProxy-Go/log",
+			"Rev": "44821eb4c034679b870fd0d6de9d19758173e829"
+		},
+		{
+			"ImportPath": "github.com/elazarl/goproxy",
+			"Comment": "v1.0-96-g6016d23",
+			"Rev": "6016d2397298b0750eeb06f4d24e03cfd7e45c77"
+		}
+	]
+}
